@@ -66,6 +66,7 @@ enable_testing()
 
 add_executable(cryptoticker_tests
     tests/binance/input_tests.cpp
+    tests/stats/stats_tests.cpp
 )
 
 target_link_libraries(cryptoticker_tests
