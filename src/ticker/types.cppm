@@ -1,16 +1,46 @@
-export module ticker.types;
+module;
+#include <optional>
+#include <string_view>
 
-export import ticker.binance.types;
+export module ticker.types;
 
 export namespace ticker::types {
 
-struct PriceTick {
-    double price;
-    long long timestamp;
+    enum class TradeSignal { Buy, Sell, Hold };
 
-    bool operator==(const PriceTick& other) const {
-        return price == other.price && timestamp == other.timestamp;
-    }
-};
+    constexpr std::string_view signal_to_string(const TradeSignal signal) {
+        switch (signal) {
+            case TradeSignal::Buy: {
+                return "Buy";
+            }
+            case TradeSignal::Sell: {
+                return "Sell";
+            }
+            case TradeSignal::Hold: {
+                return "Hold";
+            }
+        }
 
-}  // namespace ticker::types
+        return "Unknown";
+    };
+
+    struct PriceTick {
+        public:
+            double price;
+            long long timestamp;
+
+            bool operator==(const PriceTick &other) const {
+                return price == other.price && timestamp == other.timestamp;
+            }
+    };
+
+    struct StatsRow {
+        public:
+            long long timestamp;
+            double price;
+            std::optional<double> sma;
+            std::optional<double> volatility;
+            std::optional<TradeSignal> signal;
+    };
+
+} // namespace ticker::types

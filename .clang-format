@@ -1,2 +1,14 @@
-BasedOnStyle: Chromium
+BasedOnStyle: LLVM
 IndentWidth: 4
+ColumnLimit: 80
+BreakBeforeBraces: Attach
+NamespaceIndentation: All
+AccessModifierOffset: 0
+
+IndentAccessModifiers: true
+IndentCaseLabels: true
+
+InsertNewlineAtEOF: true
+
+BinPackParameters: false
+AlignAfterOpenBracket: BlockIndent

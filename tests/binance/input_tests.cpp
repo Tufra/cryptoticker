@@ -4,13 +4,11 @@ import ticker.types;
 
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("Example Test", "[example]") {
-    REQUIRE(1 + 1 == 2);
-}
+TEST_CASE("Example Test", "[example]") { REQUIRE(1 + 1 == 2); }
 
 TEST_CASE("Read Binance Price Data from JSON file", "[input]") {
-    auto input =
-        ticker::binance::input::read_binance_price_data("../data/btcusdt_1m.json");
+    auto input = ticker::binance::input::read_binance_price_data(
+        "../data/btcusdt_1m.json");
 
     REQUIRE(input.size() == 1000);
     REQUIRE(input[0].open_time == 1778853480000);
