@@ -1,8 +1,0 @@
-{
-  "clangd.path": "/usr/bin/clangd-18",
-  "clangd.arguments": [
-    "--compile-commands-dir=/mnt/c/Users/under/Documents/GitHub/cryptoticker/build",
-    "--query-driver=/usr/bin/clang++"
-  ],
-  "C_Cpp.intelliSenseEngine": "disabled"
-}
