@@ -4,6 +4,7 @@ import ticker.strategy;
 import ticker.output;
 import ticker.cli;
 import ticker.binance.input;
+import ticker.bybit.input;
 
 #include <iostream>
 #include <ranges>
@@ -21,10 +22,10 @@ int main(const int argc, const char *argv[]) {
         }
 
         auto entries =
-            ticker::binance::input::read_binance_price_data(input_path);
+            ticker::bybit::input::read_bybit_price_data(input_path);
         auto price_ticks =
             entries |
-            std::views::transform(ticker::binance::input::data_entry_to_tick);
+            std::views::transform(ticker::bybit::input::data_entry_to_tick);
 
         auto window_stats = ticker::stats::MovingWindowStats(window_size);
         auto result = std::vector<ticker::types::StatsRow>();

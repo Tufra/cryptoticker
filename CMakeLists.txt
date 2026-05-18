@@ -48,6 +48,9 @@ target_sources(cryptoticker_lib
 
             src/ticker/binance/types.cppm
             src/ticker/binance/input.cppm
+
+            src/ticker/bybit/types.cppm
+            src/ticker/bybit/input.cppm
 )
 
 target_compile_options(cryptoticker_lib
@@ -77,6 +80,8 @@ enable_testing()
 
 add_executable(cryptoticker_tests
     tests/binance/input_tests.cpp
+    tests/bybit/input_tests.cpp
+    
     tests/stats/stats_tests.cpp
     tests/strategy/strategy_tests.cpp
     tests/cli/cli_tests.cpp

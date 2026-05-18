@@ -46,5 +46,5 @@ TEST_CASE("Invalid args", "[cli]") {
     const int empty_window_argc = 5;
     const char *empty_window_argv[unknown_arg_argc] = {"./tests", "-w", "0"};
 
-    REQUIRE_THROWS(ticker::cli::parse_args(unknown_arg_argc, unknown_arg_argv));
+    REQUIRE_THROWS(ticker::cli::parse_args(empty_window_argc, empty_window_argv));
 }
