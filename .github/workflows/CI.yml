@@ -19,17 +19,22 @@ jobs:
 
       - uses: hendrikmuhs/ccache-action@v1.2
 
+      - name: Add llvm repo
+        run: |
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc >/dev/null
+          echo 'deb http://apt.llvm.org/noble/ llvm-toolchain-noble-22 main' | sudo tee /etc/apt/sources.list.d/llvm-toolchain-noble-22.list >/dev/null
+
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-18 clang-tools-18 libboost-json-dev
+          sudo apt-get install -y clang-22 clang-tools-22 libboost-json-dev
 
       - name: Configure
         run: |
-          CC=clang-18 CXX=clang++-18 \
+          CC=clang-22 CXX=clang++-22 \
           cmake -S . -B build -G Ninja \
           -DCMAKE_BUILD_TYPE=Debug \
-          -DCMAKE_CXX_COMPILER_CLANG_SCAN_DEPS=/usr/bin/clang-scan-deps-18 \
+          -DCMAKE_CXX_COMPILER_CLANG_SCAN_DEPS=/usr/bin/clang-scan-deps-22 \
           -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
           -DCMAKE_C_COMPILER_LAUNCHER=ccache
 

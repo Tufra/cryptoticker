@@ -4,7 +4,6 @@ import ticker.types;
 
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("Example Test", "[example]") { REQUIRE(1 + 1 == 2); }
 
 TEST_CASE("Read Binance Price Data from JSON file", "[input]") {
     auto input = ticker::binance::input::read_binance_price_data(

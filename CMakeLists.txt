@@ -43,6 +43,9 @@ target_sources(cryptoticker_lib
             src/ticker/log.cppm
             src/ticker/output.cppm
 
+            src/ticker/cli/cli.cppm
+            src/ticker/cli/types.cppm
+
             src/ticker/binance/types.cppm
             src/ticker/binance/input.cppm
 )
@@ -76,6 +79,8 @@ add_executable(cryptoticker_tests
     tests/binance/input_tests.cpp
     tests/stats/stats_tests.cpp
     tests/strategy/strategy_tests.cpp
+    tests/cli/cli_tests.cpp
+    tests/output/output_tests.cpp
 )
 
 target_link_libraries(cryptoticker_tests
