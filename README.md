@@ -1,14 +1,13 @@
 # CryptoTicker
 
 CryptoTicker is a command-line market data processor for local
-cryptocurrency candle datasets. It ingests Binance kline JSON, normalizes market
+cryptocurrency candle datasets. It ingests kline JSON, normalizes market
 data into internal price ticks, computes rolling statistics, derives trading
 signals, and writes deterministic CSV output suitable for downstream analysis.
 
-
 ## Features
 
-- Binance kline JSON ingestion from local files.
+- Kline JSON ingestion from local files.
 - Conversion from exchange-specific candle records to internal price ticks.
 - Rolling simple moving average (SMA).
 - Rolling volatility.
@@ -50,6 +49,7 @@ ctest --test-dir build --output-on-failure
 
 ```bash
 ./build/cryptoticker \
+  --source binance \
   --input data/btcusdt_1m.json \
   --output data/output/output.csv \
   --window-size 5
@@ -59,6 +59,7 @@ Short flags are supported:
 
 ```bash
 ./build/cryptoticker \
+  -s binance \
   -i data/btcusdt_1m.json \
   -o data/output/output.csv \
   -w 5
@@ -72,29 +73,32 @@ Show help:
 
 ## CLI Options
 
-| Option | Short | Description | Default |
-| --- | --- | --- | --- |
-| `--input` | `-i` | Input Binance kline JSON file | `input.csv` |
-| `--output` | `-o` | Output CSV file | `output.csv` |
-| `--window-size` | `-w` | Rolling statistics window size | `5` |
-| `--help` | `-h` | Print usage information | `false` |
+| Option          | Short | Description                    | Default      |
+| --------------- | ----- | ------------------------------ | ------------ |
+| `--source`      | `-s`  | Kline data format              | `bybit`      |
+| `--input`       | `-i`  | Input kline JSON file          | `input.csv`  |
+| `--output`      | `-o`  | Output CSV file                | `output.csv` |
+| `--window-size` | `-w`  | Rolling statistics window size | `5`          |
+| `--help`        | `-h`  | Print usage information        |              |
 
 Invalid arguments are reported with a non-zero exit code.
 
 ## Input Format
 
-The input reader expects Binance kline JSON arrays in the format returned by the
-Binance Spot market data endpoint.
+The input reader expects kline JSON file in the format returned by the
+specified market data endpoint.
 
-Example data acquisition:
+Supported sources:
+
+- Binance
+- Bybit
+
+Example data acquisition (Binance):
 
 ```bash
 curl "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=1000" \
   -o data/btcusdt_1m.json
 ```
-
-The current processor uses the candle close time and close price as the internal
-price tick.
 
 ## Output Format
 

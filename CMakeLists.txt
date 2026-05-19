@@ -81,11 +81,12 @@ enable_testing()
 add_executable(cryptoticker_tests
     tests/binance/input_tests.cpp
     tests/bybit/input_tests.cpp
-    
-    tests/stats/stats_tests.cpp
-    tests/strategy/strategy_tests.cpp
     tests/cli/cli_tests.cpp
-    tests/output/output_tests.cpp
+    
+    tests/stats_tests.cpp
+    tests/strategy_tests.cpp
+    tests/output_tests.cpp
+    tests/input_tests.cpp
 )
 
 target_link_libraries(cryptoticker_tests

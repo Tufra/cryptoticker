@@ -2,7 +2,6 @@ module;
 
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <string>
 
 #include <boost/json.hpp>
@@ -15,7 +14,7 @@ import ticker.types;
 export namespace ticker::bybit::input {
 
     std::vector<ticker::bybit::types::BybitKlineDataEntry>
-    read_bybit_price_data(const std::filesystem::path &filename) {
+    read_price_data(const std::filesystem::path &filename) {
         std::ifstream file(filename);
 
         if (!file.is_open()) {

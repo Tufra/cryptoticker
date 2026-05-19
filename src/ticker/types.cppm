@@ -1,5 +1,6 @@
 module;
 #include <optional>
+#include <stdexcept>
 #include <string_view>
 
 export module ticker.types;
@@ -22,6 +23,30 @@ export namespace ticker::types {
         }
 
         return "Unknown";
+    };
+
+    enum class DataSource { Binance, Bybit };
+
+    constexpr DataSource str_to_data_source(const std::string_view str) {
+        if (str == "binance") {
+            return DataSource::Binance;
+        } else if (str == "bybit") {
+            return DataSource::Bybit;
+        } else {
+            throw std::runtime_error(
+                "Unknown data source: " + std::string(str)
+            );
+        }
+    };
+
+    constexpr std::string data_source_to_str(const DataSource source) {
+        if (source == DataSource::Binance) {
+            return "binance";
+        } else if (source == DataSource::Bybit) {
+            return "bybit";
+        } else {
+            throw std::runtime_error("Unknown data source");
+        }
     };
 
     struct PriceTick {

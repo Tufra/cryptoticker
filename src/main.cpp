@@ -3,8 +3,8 @@ import ticker.stats;
 import ticker.strategy;
 import ticker.output;
 import ticker.cli;
-import ticker.binance.input;
-import ticker.bybit.input;
+import ticker.cli.types;
+import ticker.input;
 
 #include <iostream>
 #include <ranges>
@@ -16,16 +16,14 @@ int main(const int argc, const char *argv[]) {
         auto input_path = params.input;
         auto output_path = params.output;
         auto window_size = params.window_size;
+        auto source = params.source;
+
         if (params.is_help) {
             ticker::cli::print_help();
             return 0;
         }
 
-        auto entries =
-            ticker::bybit::input::read_bybit_price_data(input_path);
-        auto price_ticks =
-            entries |
-            std::views::transform(ticker::bybit::input::data_entry_to_tick);
+        auto price_ticks = ticker::input::read_market_data(source, input_path);
 
         auto window_stats = ticker::stats::MovingWindowStats(window_size);
         auto result = std::vector<ticker::types::StatsRow>();

@@ -6,11 +6,13 @@ module;
 
 export module ticker.cli;
 import ticker.cli.types;
+import ticker.types;
 
 export namespace ticker::cli {
     const auto DEFAULT_INPUT_NAME = "input.csv";
     const auto DEFAULT_OUTPUT_NAME = "output.csv";
     const auto DEFAULT_WINDOW_SIZE = 5;
+    const auto DEFAULT_SOURCE = ticker::types::DataSource::Bybit;
 
     const std::string &
     require_value(const std::string &value, const std::string &name) {
@@ -18,7 +20,7 @@ export namespace ticker::cli {
             throw std::runtime_error("Value for " + name + " is required");
         } else if (
             value.starts_with("--") || value == "-i" || value == "-o" ||
-            value == "-w" || value == "-h"
+            value == "-w" || value == "-h" || value == "-s"
         ) {
             throw std::runtime_error("Value cannot start with -");
         }
@@ -28,6 +30,7 @@ export namespace ticker::cli {
     ticker::cli::types::ProgramParameters
     parse_args(const size_t argc, const char *argv[]) {
         ticker::cli::types::ProgramParameters config{
+            .source = DEFAULT_SOURCE,
             .input = DEFAULT_INPUT_NAME,
             .output = DEFAULT_OUTPUT_NAME,
             .window_size = DEFAULT_WINDOW_SIZE,
@@ -36,18 +39,28 @@ export namespace ticker::cli {
 
         for (size_t i = 1; i < argc; i++) {
             auto arg = std::string(argv[i]);
+
             if (arg == "--input" || arg == "-i") {
-                config.input =
-                    require_value(i < argc - 1 ? argv[++i] : "", "input");
+                auto val = (i < argc - 1 ? argv[++i] : "");
+                config.input = require_value(val, "input");
             } else if (arg == "--output" || arg == "-o") {
-                config.output =
-                    require_value(i < argc - 1 ? argv[++i] : "", "output");
+                auto val = (i < argc - 1 ? argv[++i] : "");
+                config.output = require_value(val, "output");
             } else if (arg == "--window-size" || arg == "-w") {
-                config.window_size = std::stoi(
-                    require_value(i < argc - 1 ? argv[++i] : "", "window")
-                );
+                auto val = (i < argc - 1 ? argv[++i] : "");
+                config.window_size = std::stoi(require_value(val, "window"));
+                if (config.window_size <= 0) {
+                    throw std::runtime_error(
+                        "Window size must be a positive integer"
+                    );
+                }
             } else if (arg == "--help" || arg == "-h") {
                 config.is_help = true;
+            } else if (arg == "--source" || arg == "-s") {
+                auto val = (i < argc - 1 ? argv[++i] : "");
+                config.source = ticker::types::str_to_data_source(
+                    require_value(val, "source")
+                );
             } else {
                 throw std::runtime_error("Unknown argument: " + arg);
             }
@@ -57,8 +70,9 @@ export namespace ticker::cli {
     }
 
     void print_help() {
-        std::cout << "Usage: cryptoticker --input file.json --output "
-                     "file.csv --window-size 10"
+        std::cout << "Usage: cryptoticker --source [source] --input "
+                     "[input_file] --output "
+                     "[output_file] --window-size [window_size]"
                   << '\n';
     }
 
