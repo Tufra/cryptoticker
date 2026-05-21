@@ -81,6 +81,11 @@ export namespace ticker::types {
     };
 
     struct PortfolioState {
+        private:
+            double cash;
+            double position;
+
+        public:
             PortfolioState(double cash, double position = 0)
                 : cash(cash), position(position) {}
 
