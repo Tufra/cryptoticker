@@ -39,7 +39,6 @@ target_sources(cryptoticker_lib
             src/ticker/input.cppm
             src/ticker/stats.cppm
             src/ticker/types.cppm
-            src/ticker/strategy.cppm
             src/ticker/log.cppm
             src/ticker/output.cppm
 
@@ -51,6 +50,12 @@ target_sources(cryptoticker_lib
 
             src/ticker/bybit/types.cppm
             src/ticker/bybit/input.cppm
+
+            src/ticker/backtest/backtest.cppm
+            src/ticker/backtest/types.cppm
+
+            src/ticker/strategy/strategy.cppm
+            src/ticker/strategy/types.cppm
 )
 
 target_compile_options(cryptoticker_lib
@@ -82,9 +87,9 @@ add_executable(cryptoticker_tests
     tests/binance/input_tests.cpp
     tests/bybit/input_tests.cpp
     tests/cli/cli_tests.cpp
+    tests/backtest/backtest_tests.cpp
     
     tests/stats_tests.cpp
-    tests/strategy_tests.cpp
     tests/output_tests.cpp
     tests/input_tests.cpp
 )

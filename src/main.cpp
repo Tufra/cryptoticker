@@ -1,13 +1,15 @@
 import ticker.types;
 import ticker.stats;
 import ticker.strategy;
+import ticker.strategy.types;
 import ticker.output;
 import ticker.cli;
 import ticker.cli.types;
 import ticker.input;
+import ticker.backtest;
+import ticker.backtest.types;
 
 #include <iostream>
-#include <ranges>
 #include <vector>
 
 int main(const int argc, const char *argv[]) {
@@ -17,6 +19,7 @@ int main(const int argc, const char *argv[]) {
         auto output_path = params.output;
         auto window_size = params.window_size;
         auto source = params.source;
+        auto mode = params.mode;
 
         if (params.is_help) {
             ticker::cli::print_help();
@@ -28,34 +31,72 @@ int main(const int argc, const char *argv[]) {
         auto window_stats = ticker::stats::MovingWindowStats(window_size);
         auto result = std::vector<ticker::types::StatsRow>();
 
+        auto simple_strategy = ticker::strategy::SimpleStrategy();
+        auto portfolio_state = ticker::types::PortfolioState(10000);
+
         for (const auto &entry : price_ticks) {
             window_stats.push_tick(entry);
             auto price = entry.price;
             auto sma = window_stats.get_sma();
             auto vol = window_stats.get_volatility();
 
-            auto signal = sma.has_value() && vol.has_value()
-                              ? std::optional{ticker::strategy::define_signal(
-                                    price, sma.value(), vol.value()
-                                )}
-                              : std::nullopt;
+            auto row =
+                ticker::types::StatsRow{entry.timestamp, price, sma, vol};
 
-            auto row = ticker::types::StatsRow{
-                entry.timestamp, price, sma, vol, signal
-            };
             result.push_back(row);
         }
 
-        auto output = std::ofstream(output_path);
-        if (!output.is_open()) {
-            throw std::runtime_error("Failed to open file: " + output_path);
+        if (mode == ticker::types::Mode::Ticks) {
+            for (std::size_t i = 0; i < result.size(); i++) {
+                const auto history =
+                    ticker::stats::get_history_window(result, i, window_size);
+
+                auto context = ticker::strategy::types::StrategyContext{
+                    .history = history, .portfolio_state = portfolio_state
+                };
+
+                auto decision = simple_strategy.decide(context);
+
+                result[i].signal = decision.signal;
+            }
+
+            auto output = std::ofstream(output_path);
+            if (!output.is_open()) {
+                throw std::runtime_error("Failed to open file: " + output_path);
+            }
+
+            auto total_entries =
+                ticker::output::write_ticks_to_csv(output, result);
+            output.close();
+
+            std::cout << "Wrote " << total_entries << " entries to "
+                      << output_path << " with window size " << window_size
+                      << '\n';
+        } else if (mode == ticker::types::Mode::Backtest) {
+            auto backtest_engine = ticker::backtest::BacktestEngine(
+                simple_strategy, portfolio_state, window_size
+            );
+
+            auto backtest_report = backtest_engine.run_backtest(result);
+            std::cout << backtest_report.to_string() << std::endl;
+
+            auto trade_log = backtest_engine.get_trade_log();
+
+            auto output = std::ofstream(output_path);
+            if (!output.is_open()) {
+                throw std::runtime_error("Failed to open file: " + output_path);
+            }
+
+            auto total_entries =
+                ticker::output::write_backtest_trades_to_csv(output, trade_log);
+            output.close();
+
+            std::cout << "Wrote " << total_entries << " entries to "
+                      << output_path << " with window size " << window_size
+                      << '\n';
+        } else {
+            throw std::runtime_error("Unknown mode");
         }
-
-        ticker::output::write_to_csv(output, result);
-        output.close();
-
-        std::cout << "Wrote " << result.size() << " entries to " << output_path
-                  << " with window size " << window_size << '\n';
 
         return 0;
     } catch (std::exception &e) {

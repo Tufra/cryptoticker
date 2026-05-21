@@ -80,6 +80,7 @@ Show help:
 | `--output`      | `-o`  | Output CSV file                | `output.csv` |
 | `--window-size` | `-w`  | Rolling statistics window size | `5`          |
 | `--help`        | `-h`  | Print usage information        |              |
+| `--mode`        | `-m`  | Mode (`backtest` or `ticks`)   | `backtest`   |
 
 Invalid arguments are reported with a non-zero exit code.
 
@@ -102,6 +103,8 @@ curl "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=100
 
 ## Output Format
 
+### Ticks mode
+
 CryptoTicker writes CSV with the following columns:
 
 ```csv
@@ -112,15 +115,35 @@ Example:
 
 ```csv
 timestamp,price,sma,vol,signal
-1778853539999,78830.31000000,,,
-1778853599999,78758.59000000,,,
-1778853659999,78719.42000000,,,
-1778853719999,78845.78000000,,,
+1778853539999,78830.31000000,,,Hold
+1778853599999,78758.59000000,,,Hold
+1778853659999,78719.42000000,,,Hold
+1778853719999,78845.78000000,,,Hold
 1778853779999,78949.35000000,78820.69000000,79.23063928,Buy
 ```
 
-`sma`, `vol`, and `signal` are empty until the rolling window contains enough
+`sma` and `vol` are empty until the rolling window contains enough
 ticks.
+
+### Backtest mode
+
+CryptoTicker writes CSV with the following columns:
+
+```csv
+timestamp,signal,price,quantity,cash_after,position_after,commission
+```
+
+Example:
+
+```csv
+timestamp,signal,price,quantity,cash_after,position_after,commission
+1779094260000,Buy,76899.40000000,0.13004003,0.00000000,0.13004003,0.00000000
+1779094920000,Sell,76902.80000000,0.13004003,10000.44213609,0.00000000,0.00000000
+1779095280000,Buy,76866.50000000,0.13010144,0.00000000,0.13010144,0.00000000
+1779095400000,Sell,76822.70000000,0.13010144,9994.74369313,0.00000000,0.00000000
+1779095700000,Buy,76850.70000000,0.13005404,0.00000000,0.13005404,0.00000000
+1779096300000,Sell,76871.90000000,0.13005404,9997.50083869,0.00000000,0.00000000
+```
 
 ## Signal Model
 

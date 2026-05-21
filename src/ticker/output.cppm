@@ -7,12 +7,19 @@ module;
 
 export module ticker.output;
 import ticker.types;
+import ticker.backtest.types;
 
 export namespace ticker::output {
 
     void write_header(std::ostream &stream) {
         stream << "timestamp" << "," << "price" << "," << "sma" << "," << "vol"
                << "," << "signal" << '\n';
+    }
+
+    void write_backtest_trades_header(std::ostream &stream) {
+        stream << "timestamp" << "," << "signal" << "," << "price" << ","
+               << "quantity" << "," << "cash_after" << "," << "position_after"
+               << "," << "commission" << '\n';
     }
 
     void
@@ -22,7 +29,7 @@ export namespace ticker::output {
         }
     }
 
-    void write_to_csv(
+    std::size_t write_ticks_to_csv(
         std::ostream &stream, std::span<const ticker::types::StatsRow> stats
     ) {
         stream << std::fixed << std::setprecision(8);
@@ -39,10 +46,30 @@ export namespace ticker::output {
             write_optional_double(stream, vol);
             stream << ","
                    << (signal.has_value()
-                           ? ticker::types::signal_to_string(signal.value())
+                           ? ticker::types::signal_to_str(signal.value())
                            : "")
                    << "\n";
         }
+
+        return stats.size();
+    }
+
+    std::size_t write_backtest_trades_to_csv(
+        std::ostream &stream,
+        std::span<const ticker::backtest::types::Trade> stats
+    ) {
+        stream << std::fixed << std::setprecision(8);
+        write_backtest_trades_header(stream);
+
+        for (const auto &row : stats) {
+            stream << row.timestamp << ","
+                   << ticker::types::signal_to_str(row.signal) << ","
+                   << row.price << "," << row.quantity << "," << row.cash_after
+                   << "," << row.position_after << "," << row.commission
+                   << "\n";
+        }
+
+        return stats.size();
     }
 
 } // namespace ticker::output

@@ -9,7 +9,7 @@ export namespace ticker::types {
 
     enum class TradeSignal { Buy, Sell, Hold };
 
-    constexpr std::string_view signal_to_string(const TradeSignal signal) {
+    constexpr std::string signal_to_str(const TradeSignal signal) {
         switch (signal) {
             case TradeSignal::Buy: {
                 return "Buy";
@@ -49,6 +49,18 @@ export namespace ticker::types {
         }
     };
 
+    enum class Mode { Backtest, Ticks };
+
+    constexpr Mode str_to_mode(const std::string_view str) {
+        if (str == "backtest") {
+            return Mode::Backtest;
+        } else if (str == "ticks") {
+            return Mode::Ticks;
+        } else {
+            throw std::runtime_error("Unknown mode: " + std::string(str));
+        }
+    };
+
     struct PriceTick {
         public:
             double price;
@@ -66,6 +78,41 @@ export namespace ticker::types {
             std::optional<double> sma;
             std::optional<double> volatility;
             std::optional<TradeSignal> signal;
+    };
+
+    struct PortfolioState {
+            PortfolioState(double cash, double position = 0)
+                : cash(cash), position(position) {}
+
+            double get_cash() const {
+                return cash;
+            }
+
+            double get_position() const {
+                return position;
+            }
+
+            void add_cash(double cash) {
+                this->cash += cash;
+            }
+
+            void add_position(double position) {
+                this->position += position;
+            }
+
+            void remove_cash(double cash) {
+                if (cash > this->cash) {
+                    throw std::runtime_error("Not enough cash");
+                }
+                this->cash -= cash;
+            }
+
+            void remove_position(double position) {
+                if (position > this->position) {
+                    throw std::runtime_error("Not enough position");
+                }
+                this->position -= position;
+            }
     };
 
 } // namespace ticker::types

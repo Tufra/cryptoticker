@@ -13,6 +13,7 @@ export namespace ticker::cli {
     const auto DEFAULT_OUTPUT_NAME = "output.csv";
     const auto DEFAULT_WINDOW_SIZE = 5;
     const auto DEFAULT_SOURCE = ticker::types::DataSource::Bybit;
+    const auto DEFAULT_MODE = ticker::types::Mode::Backtest;
 
     const std::string &
     require_value(const std::string &value, const std::string &name) {
@@ -31,6 +32,7 @@ export namespace ticker::cli {
     parse_args(const size_t argc, const char *argv[]) {
         ticker::cli::types::ProgramParameters config{
             .source = DEFAULT_SOURCE,
+            .mode = DEFAULT_MODE,
             .input = DEFAULT_INPUT_NAME,
             .output = DEFAULT_OUTPUT_NAME,
             .window_size = DEFAULT_WINDOW_SIZE,
@@ -61,6 +63,10 @@ export namespace ticker::cli {
                 config.source = ticker::types::str_to_data_source(
                     require_value(val, "source")
                 );
+            } else if (arg == "--mode" || arg == "-m") {
+                auto val = (i < argc - 1 ? argv[++i] : "");
+                config.mode =
+                    ticker::types::str_to_mode(require_value(val, "mode"));
             } else {
                 throw std::runtime_error("Unknown argument: " + arg);
             }
@@ -72,7 +78,8 @@ export namespace ticker::cli {
     void print_help() {
         std::cout << "Usage: cryptoticker --source [source] --input "
                      "[input_file] --output "
-                     "[output_file] --window-size [window_size]"
+                     "[output_file] --window-size [window_size] --mode "
+                     "[backtest|ticks]"
                   << '\n';
     }
 

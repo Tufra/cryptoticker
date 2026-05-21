@@ -5,14 +5,15 @@ import ticker.cli.types;
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Parse args", "[cli]") {
-    const int argc = 10;
-    const char *argv[argc] = {"./tests",     "-i",   "input2.csv", "-o",
-                              "output2.csv", "-w",   "20",         "-h",
-                              "-s",          "bybit"};
+    const int argc = 12;
+    const char *argv[argc] = {"./tests",     "-i",    "input2.csv", "-o",
+                              "output2.csv", "-w",    "20",         "-h",
+                              "-s",          "bybit", "-m",         "backtest"};
 
     auto args = ticker::cli::parse_args(argc, argv);
 
     REQUIRE(args.source == ticker::types::DataSource::Bybit);
+    REQUIRE(args.mode == ticker::types::Mode::Backtest);
     REQUIRE(args.input == "input2.csv");
     REQUIRE(args.output == "output2.csv");
     REQUIRE(args.window_size == 20);
@@ -26,6 +27,7 @@ TEST_CASE("Use default args", "[cli]") {
     auto args = ticker::cli::parse_args(argc, argv);
 
     REQUIRE(args.source == ticker::cli::DEFAULT_SOURCE);
+    REQUIRE(args.mode == ticker::cli::DEFAULT_MODE);
     REQUIRE(args.input == ticker::cli::DEFAULT_INPUT_NAME);
     REQUIRE(args.output == ticker::cli::DEFAULT_OUTPUT_NAME);
     REQUIRE(args.window_size == ticker::cli::DEFAULT_WINDOW_SIZE);

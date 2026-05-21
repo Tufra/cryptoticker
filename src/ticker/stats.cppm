@@ -81,4 +81,15 @@ export namespace ticker::stats {
                 return std::sqrt(diff / tick_queue.size());
             }
     };
+
+    std::span<const ticker::types::StatsRow> get_history_window(
+        std::span<const ticker::types::StatsRow> stats,
+        std::size_t index,
+        std::size_t length
+    ) {
+        const std::size_t end = index + 1;
+        const std::size_t start = end > length ? end - length : 0;
+
+        return stats.subspan(start, end - start);
+    };
 } // namespace ticker::stats
