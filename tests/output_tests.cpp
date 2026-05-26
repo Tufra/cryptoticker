@@ -1,6 +1,6 @@
 import ticker.types;
 import ticker.output;
-import ticker.backtest.types;
+import ticker.runner.types;
 
 #include <catch2/catch_test_macros.hpp>
 #include <format>
@@ -28,16 +28,16 @@ TEST_CASE("Write Price Ticks to CSV", "[output]") {
     REQUIRE(total == 4);
 }
 
-TEST_CASE("Write Backtest Trades to CSV", "[output]") {
+TEST_CASE("Write Trades to CSV", "[output]") {
     auto output = std::ostringstream();
 
-    auto data = std::vector<ticker::backtest::types::Trade>{
+    auto data = std::vector<ticker::types::Trade>{
         {1, ticker::types::TradeSignal::Buy, 1.0, 10, 100, 100, 0},
         {2, ticker::types::TradeSignal::Hold, 2.0, 20, 200, 200, 0},
         {3, ticker::types::TradeSignal::Sell, 3.0, 30, 300, 300, 0}
     };
 
-    auto total = ticker::output::write_backtest_trades_to_csv(output, data);
+    auto total = ticker::output::write_trades_to_csv(output, data);
 
     std::string expected = "timestamp,signal,price,quantity,cash_after,"
                            "position_after,commission\n"

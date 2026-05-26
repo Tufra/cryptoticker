@@ -26,35 +26,46 @@ export namespace ticker::strategy {
             ticker::strategy::types::StrategyDecision decide(
                 const ticker::strategy::types::StrategyContext &context
             ) const override {
-                const auto& row = context.history.back();
-                const auto& portfolio_state = context.portfolio_state;
+                const auto &row = context.history.back();
+                const auto &portfolio_state = context.portfolio_state;
+                const auto price = row.price;
 
                 if (!(row.sma.has_value() && row.volatility.has_value())) {
                     return ticker::strategy::types::StrategyDecision{
-                        .signal = ticker::types::TradeSignal::Hold, .volume = 0
+                        .timestamp = row.timestamp,
+                        .signal = ticker::types::TradeSignal::Hold,
+                        .volume = 0,
+                        .price = price
                     };
                 }
-
-                const auto price = row.price;
                 const auto sma = row.sma.value();
                 const auto volatility = row.volatility.value();
 
                 if (price > sma + volatility) {
                     const double volume =
                         decide_volume_to_buy(portfolio_state.get_cash(), price);
+                    
                     return ticker::strategy::types::StrategyDecision{
+                        .timestamp = row.timestamp,
                         .signal = ticker::types::TradeSignal::Buy,
-                        .volume = volume
+                        .volume = volume,
+                        .price = price
                     };
                 } else if (price < sma - volatility) {
                     const double volume = portfolio_state.get_position();
+
                     return ticker::strategy::types::StrategyDecision{
+                        .timestamp = row.timestamp,
                         .signal = ticker::types::TradeSignal::Sell,
-                        .volume = volume
+                        .volume = volume,
+                        .price = price
                     };
                 } else {
                     return ticker::strategy::types::StrategyDecision{
-                        .signal = ticker::types::TradeSignal::Hold, .volume = 0
+                        .timestamp = row.timestamp,
+                        .signal = ticker::types::TradeSignal::Hold,
+                        .volume = 0,
+                        .price = price
                     };
                 }
             }

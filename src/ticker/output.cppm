@@ -7,7 +7,7 @@ module;
 
 export module ticker.output;
 import ticker.types;
-import ticker.backtest.types;
+import ticker.runner.types;
 
 export namespace ticker::output {
 
@@ -54,9 +54,8 @@ export namespace ticker::output {
         return stats.size();
     }
 
-    std::size_t write_backtest_trades_to_csv(
-        std::ostream &stream,
-        std::span<const ticker::backtest::types::Trade> stats
+    std::size_t write_trades_to_csv(
+        std::ostream &stream, std::span<const ticker::types::Trade> stats
     ) {
         stream << std::fixed << std::setprecision(8);
         write_backtest_trades_header(stream);
@@ -64,7 +63,7 @@ export namespace ticker::output {
         for (const auto &row : stats) {
             stream << row.timestamp << ","
                    << ticker::types::signal_to_str(row.signal) << ","
-                   << row.price << "," << row.quantity << "," << row.cash_after
+                   << row.price << "," << row.volume << "," << row.cash_after
                    << "," << row.position_after << "," << row.commission
                    << "\n";
         }

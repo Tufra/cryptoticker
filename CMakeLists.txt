@@ -51,11 +51,16 @@ target_sources(cryptoticker_lib
             src/ticker/bybit/types.cppm
             src/ticker/bybit/input.cppm
 
-            src/ticker/backtest/backtest.cppm
-            src/ticker/backtest/types.cppm
+            src/ticker/runner/runner.cppm
+            src/ticker/runner/types.cppm
 
             src/ticker/strategy/strategy.cppm
             src/ticker/strategy/types.cppm
+
+            src/ticker/risk_manager/risk_manager.cppm
+            src/ticker/risk_manager/types.cppm
+
+            src/ticker/executor/executor.cppm
 )
 
 target_compile_options(cryptoticker_lib
@@ -88,6 +93,7 @@ add_executable(cryptoticker_tests
     tests/bybit/input_tests.cpp
     tests/cli/cli_tests.cpp
     tests/backtest/backtest_tests.cpp
+    tests/risk_manager/simple_risk_manager_tests.cpp
     
     tests/stats_tests.cpp
     tests/output_tests.cpp

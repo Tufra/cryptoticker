@@ -1,16 +1,19 @@
+#include <iostream>
+#include <vector>
+
 import ticker.types;
 import ticker.stats;
 import ticker.strategy;
 import ticker.strategy.types;
+import ticker.risk_manager;
 import ticker.output;
 import ticker.cli;
 import ticker.cli.types;
 import ticker.input;
-import ticker.backtest;
-import ticker.backtest.types;
+import ticker.runner;
+import ticker.runner.types;
+import ticker.executor;
 
-#include <iostream>
-#include <vector>
 
 int main(const int argc, const char *argv[]) {
     try {
@@ -32,7 +35,11 @@ int main(const int argc, const char *argv[]) {
         auto result = std::vector<ticker::types::StatsRow>();
 
         auto simple_strategy = ticker::strategy::SimpleStrategy();
+        auto simple_risk_manager =
+            ticker::risk_manager::SimpleRiskManager(0.1, 0.1, 0.3);
         auto portfolio_state = ticker::types::PortfolioState(10000);
+        auto simulation_executor =
+            ticker::executor::SimulationExecutor(portfolio_state);
 
         for (const auto &entry : price_ticks) {
             window_stats.push_tick(entry);
@@ -73,11 +80,12 @@ int main(const int argc, const char *argv[]) {
                       << output_path << " with window size " << window_size
                       << '\n';
         } else if (mode == ticker::types::Mode::Backtest) {
-            auto backtest_engine = ticker::backtest::BacktestEngine(
-                simple_strategy, portfolio_state, window_size
+            auto backtest_engine = ticker::runner::Runner(
+                simple_strategy, simple_risk_manager, simulation_executor,
+                portfolio_state, window_size
             );
 
-            auto backtest_report = backtest_engine.run_backtest(result);
+            auto backtest_report = backtest_engine.run(result);
             std::cout << backtest_report.to_string() << std::endl;
 
             auto trade_log = backtest_engine.get_trade_log();
@@ -88,7 +96,7 @@ int main(const int argc, const char *argv[]) {
             }
 
             auto total_entries =
-                ticker::output::write_backtest_trades_to_csv(output, trade_log);
+                ticker::output::write_trades_to_csv(output, trade_log);
             output.close();
 
             std::cout << "Wrote " << total_entries << " entries to "

@@ -89,21 +89,13 @@ export namespace ticker::types {
             PortfolioState(double cash, double position = 0)
                 : cash(cash), position(position) {}
 
-            double get_cash() const {
-                return cash;
-            }
+            double get_cash() const { return cash; }
 
-            double get_position() const {
-                return position;
-            }
+            double get_position() const { return position; }
 
-            void add_cash(double cash) {
-                this->cash += cash;
-            }
+            void add_cash(double cash) { this->cash += cash; }
 
-            void add_position(double position) {
-                this->position += position;
-            }
+            void add_position(double position) { this->position += position; }
 
             void remove_cash(double cash) {
                 if (cash > this->cash) {
@@ -118,6 +110,54 @@ export namespace ticker::types {
                 }
                 this->position -= position;
             }
+
+            double get_equity(double price) const {
+                return cash + position * price;
+            }
+    };
+
+    struct Trade {
+        public:
+            long long timestamp;
+            ticker::types::TradeSignal signal;
+            double price;
+            double volume;
+            double cash_after;
+            double position_after;
+            double commission;
+
+            bool success;
+
+            std::string to_string() const {
+                return "Timestamp: " + std::to_string(timestamp) +
+                       "\nSignal: " + ticker::types::signal_to_str(signal) +
+                       "\nPrice: " + std::to_string(price) +
+                       "\nQuantity: " + std::to_string(volume) +
+                       "\nCash After: " + std::to_string(cash_after) +
+                       "\nPosition After: " + std::to_string(position_after) +
+                       "\nCommission: " + std::to_string(commission) +
+                       "\nSuccess: " + std::to_string(success) + "\n\n";
+            };
+    };
+
+    struct TradeDecision {
+        public:
+            long long timestamp;
+            TradeSignal signal;
+            double price;
+            double volume;
+            std::optional<double> stop_loss;
+            std::optional<double> take_profit;
+
+            std::string to_string() const {
+                return "Timestamp: " + std::to_string(timestamp) +
+                       "\nSignal: " + ticker::types::signal_to_str(signal) +
+                       "\nPrice: " + std::to_string(price) +
+                       "\nQuantity: " + std::to_string(volume) +
+                       "\nStop Loss: " + std::to_string(stop_loss.value_or(0)) +
+                       "\nTake Profit: " +
+                       std::to_string(take_profit.value_or(0)) + "\n\n";
+            };
     };
 
 } // namespace ticker::types
